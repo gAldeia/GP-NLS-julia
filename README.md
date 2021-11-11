@@ -1,7 +1,11 @@
 # GP-NLS-julia
 
-Julia implementation of the GP-NLS algorithm described in the paper "Parameter
-identifcation for symbolic regression using nonlinear least squares".
+Julia implementation of the GP-NLS algorithm described in the paper:
+
+> [Kommenda, M., Burlacu, B., Kronberger, G. et al. Parameter identification for symbolic regression using nonlinear least squares. _Genet Program Evolvable_ _Mach_ 21, 471–501 (2020)](https://link.springer.com/article/10.1007/s10710-019-09371-3).
+
+The
+documentation of this package is available [here](https://galdeia.github.io/GP-NLS-julia/).
 
 Symbolic regression is the task of finding a good mathematical expression
 to describe the relationship between a set of independent variables 
@@ -49,7 +53,7 @@ squares optimization by importing it:
 using GP_NLS
 ```
 
-The first time you import, Julia wil precompile all files
+The first time you import, Julia wil precompile all files, this can take a while.
 
 ## Testing:
 
