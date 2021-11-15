@@ -7,7 +7,7 @@ como conteúdo dos nós da árvore (e não como nós diretos).
 
 ```@autodocs
 Modules = [GP_NLS]
-Pages   = ["Nodes.jl"]
+Pages   = ["NodeContent.jl"]
 ```
 
 ## Índice

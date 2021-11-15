@@ -1,11 +1,17 @@
-"""
-Função que recebe um nó qualquer de uma árvore (```AbstractNode```) e recursivamente
-constrói uma _string_ representando a árvore passada. Funções são denotadas sempre
-na notação prefixada, com os argumentos entre parênteses.
+# Author:  Guilherme Aldeia
+# Contact: guilherme.aldeia@ufabc.edu.br
+# Version: 1.0.0
+# Last modified: 13-11-2021 by Guilherme Aldeia
+
+
+"""Function that takes any node of a tree (```AbstractNode```) and recursively
+builds a _string_ representation of the tree, where functions are always denoted
+in prefixed notation, with arguments in parentheses.
 
     getstring(node::AbstractNode)::String
 
-Implementa um despache múltiplo para cada subtipo de ```AbstractNode```.
+This function works by having a multiple dispatch for each subtype of
+```AbstractNode```.
 """
 function getstring(node::TerminalNode)::String
         return node.terminal.str_rep
@@ -18,19 +24,23 @@ function getstring(node::InternalNode)::String
 end
 
 
-"""
-Função que recebe um nó qualquer de uma árvore (```AbstractNode```) e recursivamente
-recria a estrutura, de forma que as referências não sejam compartilhadas entre a
-árvore passada e a árvore retornada, evitando efeitos colaterais no manuseio.
-Implementa despache múltiplo.
+"""Function that takes any node of a tree (```AbstractNode```) and recursively
+recreates the structure so that references are not shared between the
+tree passed and the tree returned, avoiding side effects when manipulating
+the tree.
 
     copy_tree(node::AbstractNode)::TerminalNode
+
+This function works by having a multiple dispatch for each subtype of
+```AbstractNode```.
 """
 function copy_tree(node::TerminalNode)::TerminalNode
     if typeof(node.terminal) == Var
         return TerminalNode(node.terminal)
     elseif typeof(node.terminal) == WeightedVar
-        return TerminalNode(WeightedVar(node.terminal.var_name, node.terminal.var_idx, node.terminal.weight)) 
+        return TerminalNode(WeightedVar(
+            node.terminal.var_name, node.terminal.var_idx, node.terminal.weight
+        )) 
     else
         return TerminalNode(Const(node.terminal.value))
     end
@@ -41,77 +51,81 @@ function copy_tree(node::InternalNode)::InternalNode
 end
 
 
-"""
-Função que recebe um nó qualquer de uma árvore (```AbstractNode```) e recursivamente
-encontra a profundidade da árvore como sendo o tamanho de seu maior galho.
-Implementa múltiplo despache.
+"""Function that takes any node of a tree (```AbstractNode```) and recursively
+finds the depth of the tree, where the depth is the size of its largest branch.
+This depth function does not take into count the coefficients of weighted
+variables (which are, in fact, a subtree with depth 2). To find the depth
+of a tree considering weighted variables as a subtree (and not as a single
+node), use the function ```true_depth```.
 
     depth(node::AbstractNode)::Int64
 
-Essa profundidade corresponde ao número de nós existentes, sendo que os nós
-de variáveis ponderadas (que são uma subárvore com profundidade 2) ainda são considerados
-com profundidade 1.
+This function works by having a multiple dispatch for each subtype of
+```AbstractNode```.
 """
 depth(node::TerminalNode)::Int64 = 1
 depth(node::InternalNode)::Int64 = 1 + maximum([depth(c) for c in node.children])
 
 
-"""
-Função que recebe um nó qualquer de uma árvore (```AbstractNode```) e recursivamente
-encontra a profundidade da árvore como sendo o tamanho de seu maior galho.
-Implementa múltiplo despache.
+"""Function that takes any node of a tree (```AbstractNode```) and recursively
+finds the depth of the tree, where the depth is the size of its largest branch.
+This depth function returns a value that corresponds to the number of existing
+nodes in the tree, considering weighted variables as being a subtree of depth 2.
+This function is not used in implementations, and is available to users who
+want to get the real depth of GP-NLS trees.
 
-    depth(node::AbstractNode)::Int64
+    true_depth(node::AbstractNode)::Int64
 
-Essa profundidade é real, e corresponde ao número de nós existentes, considerando a
-profundidade da subárvore de variáveis com pesos. Essa função não é utilizada nas implementações,
-e fica disponível para o usuário caso deseje obter a profundidade real considerando variáveis
-ponderadas. 
+This function works by having a multiple dispatch for each subtype of
+```AbstractNode```.
 """
 true_depth(node::TerminalNode)::Int64 = 1
 true_depth(node::InternalNode)::Int64 = 1 + maximum([true_depth(c) for c in node.children])
 
 
-"""
-Função que recebe um nó qualquer de uma árvore (```AbstractNode```) e recursivamente
-conta o total de nós que a árvore possui. Implementa múltiplo despache.
+"""Function that takes any node of a tree (```AbstractNode```) and recursively
+counts the total number of nodes of the tree. This function counts weighted
+variables as a single node. To find the number of nodes of a tree considering
+weighted variables as a subtree (and not as a single node), use the function
+```true_numberofnodes```.
 
     numberofnodes(node::AbstractNode)::Int64
 
-Essa função não considera variáveis ponderadas como um único nó.
+This function works by having a multiple dispatch for each subtype of
+```AbstractNode```.
 """
 numberofnodes(node::TerminalNode)::Int64 = 1
 numberofnodes(node::InternalNode)::Int64 = 1 + sum([numberofnodes(c) for c in node.children])
 
 
-"""
-Função que recebe um nó qualquer de uma árvore (```AbstractNode```) e recursivamente
-conta o total de nós que a árvore possui. Implementa múltiplo despache.
+"""Function that takes any node of a tree (```AbstractNode```) and recursively
+counts the total number of nodes of the tree. This function counts weighted 
+variables as three nodes. This function is only used in mutate, crossover, and
+initialize operations to avoid creating trees larger than the allowed.
 
-true_numberofnodes(node::AbstractNode)::Int64
+    true_numberofnodes(node::AbstractNode)::Int64
 
-Essa função não considera variáveis ponderadas como três nós. Essa função só é utilizada
-nas operações de mutação, crossover e inicialização para evitar árvores maiores que o 
-permitido.
+This function works by having a multiple dispatch for each subtype of
+```AbstractNode```.
 """
 true_numberofnodes(node::TerminalNode)::Int64 = typeof(node.terminal) == WeightedVar ? 3 : 1
 true_numberofnodes(node::InternalNode)::Int64 = 1 + sum([true_numberofnodes(c) for c in node.children])
 
 
-"""
-Função que recebe o conjunto de filhos ```children::Vector{AbstractNode}``` e um
-inteiro ```p``` (__que deve ser menor ou igual ao número de nós somados de todos 
-os filhos passados__) e encontra o filho que contém o p-ésimo nó da árvore caso
-fosse percorrida na ordem nó > filho 1 > filho 2 > .... ```p``` deve ser 
-obtida pelo número de nós da árvore (não o número de nós real, considerando vários
-nós em variáveis com peso).
+"""Function that takes a set of children of the same node as the array
+```children::Vector{AbstractNode}```, and an integer ```p``` (__which must be
+less than or equal to number of nodes in ```children```__) and finds the child
+containing the p-th node of the children if it was traversed inorder.
+
+Returns a tuple containing the child which contains the node of index ```p```,
+and an integer informing the position of the p-th node within the returned
+(child) subtree.
 
     which_children(p::Int64, children::Vector{AbstractNode})::Tuple{Int64, AbstractNode}
-
-Retorna uma tupla contendo o filho que contém o nó de índice desejado, e um inteiro
-informando a posição do p-ésimo nó dentro da sub-árvore (filho) retornada.
 """
-function which_children(p::Int64, children::Vector{AbstractNode})::Tuple{Int64, AbstractNode}
+function which_children(
+    p::Int64, children::Vector{AbstractNode})::Tuple{Int64, AbstractNode}
+
     if numberofnodes(children[1]) < p
         return which_children(p - numberofnodes(children[1]), children[2:end])
     else
@@ -120,14 +134,14 @@ function which_children(p::Int64, children::Vector{AbstractNode})::Tuple{Int64, 
 end
 
 
-"""
-Função que recebe um nó qualquer de uma árvore (```AbstractNode```) e um inteiro
-```p``` (__que deve ser menor ou igual ao número de nós da árvore passada__) e
-retorna o galho na posição ```p```.
+"""Function that takes any node of a tree (```AbstractNode```) and an integer
+```p``` (__which must be less than or equal to the number of nodes in
+```tree```__) and returns the branch at position ```p```.
 
     get_branch_at(p::Int64, node::AbstractNode)::AbstractNode
 """
 function get_branch_at(p::Int64, node::AbstractNode)::AbstractNode
+
     if p <= 1
         return node
     else
@@ -136,25 +150,27 @@ function get_branch_at(p::Int64, node::AbstractNode)::AbstractNode
 end
 
 
-"""
-Função que recebe um ponto ```p``` (__que deve ser menor ou igual ao número de
-nós da árvore passada__), um galho do tipo ```AbstractNode``` e uma lista de filhos
-```Vector{AbstractNode}``` e retorna uma modificação da lista de filhos, sendo que
-o nó de posição ```p``` será substituído pelo galho passado. __Altera a lista de
-filhos passada como argumento__.
+"""Function that takes a point ```p``` (__which must be less than or equal to
+the number of nodes of ```branch```__), a branch of type ```AbstractNode```,
+and a list of children ```Vector{AbstractNode}```.
+Returns a modification of the list of children, where the ```p``` position node
+will be replaced by the given branch. __This function changes the list of
+children passed as argument__.
 
     change_children!(p::Int64, branch::AbstractNode, children::Vector{AbstractNode})::Vector{AbstractNode}
 
-Esse método é auxiliar de ```change_at!``` e de uso interno da biblioteca.
+This function is a helper to ```change_at!```, and itsfor internal use.
+It is not exported by the module.
 """
-function change_children!(p::Int64, branch::AbstractNode, children::Vector{AbstractNode})::Vector{AbstractNode}
+function change_children!(
+    p::Int64, branch::AbstractNode, children::Vector{AbstractNode})::Vector{AbstractNode}
 
     if size(children, 1) == 0 
         return Vector{AbstractNode}(undef, 0)
     end
 
-    # Se o número de nós no primeiro filho for menor que p, sabemos que não é
-    # esse filho que vai ser modificado, e vamos pro próximo
+    # If the number of nodes in the first child is smaller than p, we know it's
+    # not this child that's going to be modified. Let's go to the next
     if numberofnodes(children[1]) <= p
         return prepend!(
             change_children!(p-numberofnodes(children[1]), branch, children[2:end]),
@@ -169,21 +185,21 @@ function change_children!(p::Int64, branch::AbstractNode, children::Vector{Abstr
 end
 
 
-"""
-Recebe um ponto ```p``` do tipo inteiro (__que deve ser menor ou igual ao número de
-nós da árvore passada__), um galho do tipo ```AbstractNode``` e um nó qualquer 
-representando uma árvore```AbstractNode```, e insere o galho na árvore passada 
-no nó de posição ```p```. __Altera a árvore passada como argumento__.
+"""Takes a point ```p``` of type integer (__which must be less than or equal
+to the number of nodes of ```branch```__), a branch of type ```AbstractNode```,
+and any node ```AbstractNode``` representing a tree.
+Returns a modification of the tree by inserting the branch into the tree
+at position ```p``. __This function changes the tree passed as argument__.
 
     change_at!(p::Int64, branch::AbstractNode, node::AbstractNode)::AbstractNode
 
-Recebe um ponto, uma subárvore para inserir, e a árvore onde será inserida.
-Esse método que realiza a modificação de uma árvore no _crossover_.
+This method is mainly used to modify trees in the _crossover_ operation.
 """
-function change_at!(p::Int64, branch::AbstractNode, node::AbstractNode)::AbstractNode
+function change_at!(
+    p::Int64, branch::AbstractNode, node::AbstractNode)::AbstractNode
 
-    # se não estamos no ponto de alterar, então será em algum filho desse ponto.
-    # Vamos chamar altera_filhos na lista de filhos
+    # If we are not at the point p, then it will be in some child of that
+    # tree. Let's call change_children! in the list of children
     if p <= 1
         return branch
     else
@@ -192,15 +208,16 @@ function change_at!(p::Int64, branch::AbstractNode, node::AbstractNode)::Abstrac
 end
 
 
-"""
-Recebe um ponto ```p``` do tipo inteiro (__que deve ser menor ou igual ao número de
-nós da árvore passada__) e um nó qualquer representando uma árvore```AbstractNode```,
-e encontra a profundidade da subárvore na posição ```p```.
+"""Takes a point ```p``` of type integer (__which must be less than or equal
+to the number of nodes of the ```node``` passed__) and any node
+```AbstractNode``` representing a tree, then this function find and return
+the depth of the subtree at position ```p```.
 
     get_depth_at(p::Int64, node::AbstractNode)::Int64
 
-É como o método de obter a profundidade, mas esse método calcula a profundidade
-parcial de uma subárvore que está no ponto ```p```.
+It's almost like finding the depth of the tree, but when we are interested 
+in finding the depth of a subtree that is at the point ```p```, not the whole
+tree depth.
 """
 function get_depth_at(p::Int64, node::AbstractNode)::Int64
     if p <= 1
@@ -211,32 +228,33 @@ function get_depth_at(p::Int64, node::AbstractNode)::Int64
 end
 
 
-"""
-Encontra todos os galhos de uma árvore qualquer ```node``` que tem uma quantidade
-de nós menor ou igual que ```allowedSize``` __e__ uma profundidade menor ou igual
-que ```allowedDepth``` . Retorna uma lista com a posição de todos os galhos encontrados.
+"""Finds all branches of any tree ```node``` that have a number
+of nodes less than or equal to ```allowedSize``` __and__ a depth less than or
+equal to ```allowedDepth``` . Returns a list with the position of all
+branches found.
 
     branches_in_limits(
         allowedSize::Int64, allowedDepth::Int64, node::AbstractNode, _point::Int64=1)::Vector{Int64}
 
-O parâmetro ```_point``` é de uso interno, e serve para monitorar o ponto da árvore
-onde foram encontrados os candidatos. Em chamadas recursivas ele faz sentido, mas fora 
-da função ele não representa nenhuma informação útil.
+The ```_point``` parameter being returned is for internal use, and serves to
+monitor the point of the tree where the candidates were found. This is only
+meaningful to recursive calls, and outside of the function it does not represent
+any useful information.
 """
 function branches_in_limits(
     allowedSize::Int64, allowedDepth::Int64, node::AbstractNode, _point::Int64=1)::Tuple{Vector{Int64}, Int64}
     
     found = Vector{Int64}(undef, 0)
     
-    # Primeiro vamos ver se o nó em questão serve
+    # First let's see if the node in question fits
     if true_numberofnodes(node) <= allowedSize && depth(node) <= allowedDepth
         push!(found, _point)
     end
 
-    # Se tiver filhos, precisamos chamar recursivamente
+    # If it has children, we need to recursively call
     if typeof(node) == InternalNode
 
-        # Temos que chamar os filhos passando o ponto que eles são na árvore
+        # We have to call the children passing the point they are in the tree
         for c in node.children
             child_found, _point = branches_in_limits(allowedSize, allowedDepth, c, _point+1)
 

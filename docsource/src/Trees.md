@@ -7,7 +7,7 @@ aqui, que funcionam como um esqueleto das árvores.
 
 ```@autodocs
 Modules = [GP_NLS]
-Pages   = ["Trees.jl"]
+Pages   = ["TreeStructure.jl"]
 ```
 
 ## Índice

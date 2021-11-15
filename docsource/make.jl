@@ -1,6 +1,5 @@
 using Documenter
 
-# Isso assume que o pacote pode ser encontrado pela Julia
 using GP_NLS
 
 makedocs(
@@ -9,16 +8,16 @@ makedocs(
     repo="https://github.com/gAldeia/GP-NLS-julia",
     build="../docs",
     pages = [
-        "index.md",
-        "Tipos e funções acessíveis" => "Exported.md",
-        "Todas as implementações" => [
-            "Conteúdos dos nós" => "Nodes.md",
-            "Estrutura das árvores" => "Trees.md",
-            "Funções de utilidade" => "Utils.md",
-            "Avaliação de árvores" => "Evaluation.md",
-            "Inicialização de população" => "Initialization.md",
-            "Algoritmo evolutivo" => "Evolutionary.md",
-            "Otimização não-linear" => "LsqOptimization.md",
+        "GP_NLS" => "index.md",
+        "Types and functions exported" => "Exported.md",
+        "All source code" => [
+            "Node contents" => "Nodes.md",
+            "Tree structures" => "Trees.md",
+            "Utility functions" => "Utils.md",
+            "Tree evaluation" => "Evaluation.md",
+            "Population initialization" => "Initialization.md",
+            "The GP Algorithm" => "Evolutionary.md",
+            "Non-linear optimization" => "LsqOptimization.md",
         ]
     ]    
 )

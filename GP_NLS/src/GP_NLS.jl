@@ -1,35 +1,58 @@
+# Author:  Guilherme Aldeia
+# Contact: guilherme.aldeia@ufabc.edu.br
+# Version: 1.0.0
+# Last modified: 13-11-2021 by Guilherme Aldeia
+
+
+"""Entry point of GP_NLS module.
+"""
+
+
+__precompile__()
+
 module GP_NLS
 
-export Func, Const, Var, WeightedVar, ERC,                 # Possibilitar criação do conteúdo dos nós
-       defaultFunctionSet, defaultConstSet, defaultERCSet, # Conjuntos padrões para exemplo ou uso off-the-shelf
-       GP, evaluate,                                       # implementação do GP e evaluate/predict
-       getstring, fitness, numberofnodes, depth,           # Inspecionar a expressão final
-       true_numberofnodes, true_depth                      # Contagem adicional de nós e profundidades
+export 
+    # Different Tree nodes 
+    Func, Const, Var, WeightedVar, ERC,
+
+    # Default set of nodes to allow off-the-shelf usage
+    defaultFunctionSet, defaultConstSet, defaultERCSet,
+
+    # GP algorrithm and evaluate/predict
+    GP, evaluate,
+
+    # Inspection of final expression
+    getstring, fitness, numberofnodes, depth,
+
+    # Correctly counting the coefficients in GP-NLS expanded trees
+    true_numberofnodes, true_depth
 
 using LsqFit
 using Random
 using LinearAlgebra
 using Statistics
 
-# Primeiro vamos criar estruturas que serão utilizadas nos nós internos da árvore de expressão
-include("Nodes.jl")
 
-# Agora vamos criar estruturas para ser o esqueleto da árvore
-include("Trees.jl")
+# Different nodes implemented to build up expression trees
+include("NodeContent.jl")
 
-# Funções auxiliares para manipular as estruturas de árvores
+# Structure of expression trees: inner nodes and terminal nodes 
+include("TreeStructure.jl")
+
+# Auxiliary methods to manipulate trees
 include("Utils.jl")
 
-# Funções para criar indivíduos e populações
+# Different initialization methods for the first population
 include("Initialization.jl")
 
-# Funções de avaliação de árvores (eval e fitness)
+# Evaluation of trees and fitness (RMSE)
 include("Evaluation.jl")
 
-# Funções relacionadas ao algoritmo evolutivo.
+# GP algorithm
 include("Evolutionary.jl")
 
-# Incluindo as funções de otimização não lineares. Todas aqui são internas ao pacote
+# Non-linear least squares optimization
 include("LsqOptimization.jl")
 
 end # module

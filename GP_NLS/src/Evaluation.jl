@@ -1,19 +1,29 @@
-"""
-Função que recebe um nó qualquer de uma árvore (```AbstractNode```), e implementa
-um despache múltiplo para o caso de ```TerminalNode``` e ```InternalNode```, e 
-uma matriz de dados ```X```. Função para avaliar uma base de dados utilizando a árvore
-passada.
+# Author:  Guilherme Aldeia
+# Contact: guilherme.aldeia@ufabc.edu.br
+# Version: 1.0.0
+# Last modified: 13-11-2021 by Guilherme Aldeia
+
+
+"""Function that takes any node of a tree (```AbstractNode```), and
+an data matrix ```X``` (where each row is an observation and each column is
+a variable), and evaluate the prediction for each observation in ```X```.
+The function makes a recursive call along the tree node and evaluates the
+expression using the matrix variable columns that exist in the tree.
+
+If the node is a ```InternalNode```, the recursive call is made with its children and the
+result is used as arguments of the node function.
+    
+If it is a ```TerminalNode``` with content ```Const```, a vector with
+```size(X, 1)``` repeatedly containing the constant is returned.
+
+If it is a ```TerminalNode``` with content ```Var``` or ```WeightedVar```, the
+column of the index ```Var.var_idx``` of ```X``` will be used to extract 
+the value of the variable from the matrix.
 
     evaluate(node::Union{TerminalNode, InternalNode}, X::Matrix{Float64})::Vector{Float64}
 
-A função faz uma chamada recursiva ao longo do nó passado e avalia a expressão
-utilizando as colunas de variáveis da matriz que existem na árvore.
-
-Caso o nó seja uma função, a chamada recursiva é feita com seus filhos e o resultado
-é utilizado como argumentos na função. Caso seja uma constante, um vetor com 
-```size(X, 1)``` contendo repetidas vezes a constante é retornado. Caso seja uma
-variável, a coluna de ```X``` de mesmo índice ```Var.var_idx``` será utilizado
-para extrair um vetor da matriz.
+Implements a multiple dispatch for the case of ```TerminalNode``` and
+```InternalNode```.
 """
 function evaluate(node::TerminalNode, X::Matrix{Float64})::Vector{Float64}
     if typeof(node.terminal) == Var
@@ -37,22 +47,19 @@ function evaluate(node::InternalNode, X::Matrix{Float64})::Vector{Float64}
 end
 
 
-"""
-Função que mede o fitness de uma árvore qualquer, em relação a uma matriz de observações
-```X::Matrix{Float64}``` e um vetor de resultados esperados ```y::Vector{Float64}```.
+"""Function that measures the fitness of a given tree, in relation to an
+training data matrix ```X::Matrix{Float64}``` and a vector of expected results
+```y::Vector{Float64}```.
 
     fitness(tree::AbstractNode, X::Matrix{Float64}, y::Vector{Float64})::Float64
 
-O fitness é calculado utilizando o RMSE, e esse método retorna um fitness
-infinito caso a árvore falhe em avaliar --- fazendo com que a pressão seletiva
-seja forte e provavelmente elimine o indivíduo da população sem ter que pensar em
-operações protegidas, o que é particularmente interessante por não aumentar a
-complexidade das funções dos nós, já que é feito o uso de um autodiff para diferenciar
-a árvore, e pode ser problemático diferenciar funções com IFS ou cálculos mais elaborados.
+The fitness is calculated using the RMSE, and this method returns an infinite
+fitness if the tree fails to evaluate --- forcing the selective pressure to
+likely eliminate the individual from the population without having to think
+about protected operations.
 """
 function fitness(tree::AbstractNode, X::Matrix{Float64}, y::Vector{Float64})::Float64
 
-    # Vamos fazer um bloco para cuidar de erros aqui -> atribuir fitness alto
     try
         RMSE = sqrt( mean( (evaluate(tree, X) .- y).^2 ) )
         

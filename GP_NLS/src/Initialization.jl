@@ -1,43 +1,50 @@
-"""
-Função que recebe o conjunto de conteúdos terminais possíveis e faz a criação de um
-nó terminal. Essa função, de uso interno, serve para criar um nó terminal com o
-tratamento do ERC.
+# Author:  Guilherme Aldeia
+# Contact: guilherme.aldeia@ufabc.edu.br
+# Version: 1.0.0
+# Last modified: 15-11-2021 by Guilherme Aldeia
 
-    _create_random_terminal(tSet::Vector{Union{Var, WeightedVar, Const, ERC}})::TerminalNode
 
-A criação de um nó terminal envolve um passo de verificação adicional para
-o caso de ERC, que deve substituir o nó por uma constante dentro do intervalo
-especificado. 
+"""Function that receives the set of terminal contents and creates a random
+terminal node.
+
+    _create_random_terminal(
+        tSet::Vector{Union{Var, WeightedVar, Const, ERC}})::TerminalNode
+
+Creating a terminal node involves an additional verification step for
+the case of ERC, which must be replaced with a constant within the range
+specified.
 """
-function _create_random_terminal(tSet::Vector{Union{Var, WeightedVar, Const, ERC}})::TerminalNode
+function _create_random_terminal(
+    tSet::Vector{Union{Var, WeightedVar, Const, ERC}})::TerminalNode
 
     t = tSet[Random.rand(1:end)]
         
-    if typeof(t) == ERC    
-        # Sorteando um valor aleatório no intervalo do ERC e criando uma Const
+    if typeof(t) == ERC
         randVal = Random.rand()
         range = t.u_bound - t.l_bound
         
         return TerminalNode(Const( (randVal*range)+ t.l_bound ))
     else
-
-        return TerminalNode(t) # Aqui é uma variável/variável com peso/constante
+        # Here is a variable, weighted varible, or constant
+        return TerminalNode(t) 
     end
 end
 
 
-"""
-Função que cria uma árvore pelo método _grow_, inspirado no trabalho original de Koza.
-Recebe um conjunto de funções  ```fSet::Vector{Func}``` que serão sorteadas para os
-nós internos, um conjunto de funções ```tSet::Vector{Union{Var, WeightedVar, Const, ERC}}```
-que serão utilizadas nos terminais, e uma profundidade máxima ```maxDepth::Int64``` permitida.
-Retorna uma árvore qualquer com profundidade máxima ```maxDepth``` e utilizando os
-conteúdos de funções e terminais passados.
+"""Function that creates a tree using the _grow_ method, inspired by Koza's
+original work. Receives a set of ```fSet::Vector{Func}``` functions that will
+be used in the internal nodes, a set of
+```tSet::Vector{Union{Var, WeightedVar, Const, ERC}}``` terminals, and a maximum
+depth of ```maxDepth::Int64``` allowed.
 
-    grow(fSet::Vector{Func}, tSet::Vector{Union{Var, WeightedVar, Const, ERC}}, maxDepth::Int64)::AbstractNode
+Returns any tree with maximum depth ```maxDepth``` created using the functions
+and terminal sets.
 
-Repare que não há tamanho mínimo, significando que pode ser retornada uma árvore de um único nó.
-A profundidade máxima considera variáveis com peso como um único nó.
+     grow(fSet::Vector{Func}, tSet::Vector{Union{Var, WeightedVar, Const, ERC}},
+            maxDepth::Int64)::AbstractNode
+
+Note that there is no minimum size, meaning that a single-node tree can be
+returned. The maximum depth considers weighted variables as a single node.
 """
 function grow(
     fSet::Vector{Func}, 
@@ -57,15 +64,16 @@ function grow(
 end
 
 
-"""
-Função que cria uma árvore pelo método _full_, inspirado no trabalho original de Koza.
-Recebe um conjunto de funções  ```fSet::Vector{Func}``` que serão sorteadas para os
-nós internos, um conjunto de funções ```tSet::Vector{Union{Var, WeightedVar, Const, ERC}}```
-que serão utilizadas nos  terminais, e uma profundidade máxima ```maxDepth::Int64``` permitida.
-Retorna uma árvore qualquer com profundidade máxima ```maxDepth``` e utilizando os
-conteúdos de funções e terminais passados.
+"""Function that creates a tree using the _full_ method, inspired by Koza's
+original work. Receives a set of ```fSet::Vector{Func}``` functions, a set of
+```tSet::Vector{Union{Var, WeightedVar, Const, ERC}}``` terminals, and a maximum
+depth of ```maxDepth::Int64``` allowed.
 
-    full(fSet::Vector{Func}, tSet::Vector{Union{Var, WeightedVar, Const, ERC}}, maxDepth::Int64)::AbstractNode
+Returns any tree with maximum depth ```maxDepth``` and using the
+contents of past functions and terminals.
+
+    full(fSet::Vector{Func}, tSet::Vector{Union{Var, WeightedVar, Const, ERC}},
+            maxDepth::Int64)::AbstractNode
 """
 function full(
     fSet::Vector{Func}, 
@@ -85,29 +93,27 @@ function full(
 end
 
 
-"""
-Criação de árvores com o método Probabilistic Tree Creator 2 (PTC2), descrito
-em __Two Fast Tree-Creation Algorithms for Genetic Programming__, de Sean Luke.
+"""Tree creation with the Probabilistic Tree Creator 2 (PTC2) method, described
+in __Two Fast Tree-Creation Algorithms for Genetic Programming__, by Sean Luke.
 
-Esse método se parece com o método _full_ de Koza, mas além de respeitar um limite de 
-profundidade ```maxDepth```, respeita um limite de quantidade de nós ```expctdSize```.
-O PTC2 garante que a profundidade não ultrapasse o máximo (no nosso caso, variáveis
-com peso contam como profundidade 1), e garante que o número de
-nós não ultrapasse o valor esperado somado da maior aridade entre as funções,
-isso é, ``expctdSize + max(aridade(f)), f in fSet``.
+This method looks like Koza's _full_ method, but in addition to respecting a
+limit of ```maxDepth``` depth, it also respects a limit of number of nodes 
+```expctdSize```.
+
+PTC2 ensures that the depth does not exceed the maximum (in our case, weighted
+variables count as depth 1), and ensures that the number of nodes does not
+exceed the expected value added to the highest arity between the functions,
+that is, ``expctdSize + max(arity(f)), f in fSet``.
 
     PTC2(
-        fSet::Vector{Func}, 
-        tSet::Vector{Union{Var, WeightedVar, Const, ERC}}, 
+        fSet::Vector{Func},
+        tSet::Vector{Union{Var, WeightedVar, Const, ERC}},
         maxDepth::Int64,
         expctdSize::Int64)::AbstractNode
 
-Aqui adotamos que a chance de selecionar um terminal ``t`` quando for necessário inserir
-um terminal será uniforme para todos os terminais, e a chance de inserir uma função 
-também seguirá a mesma lógica.
-
-O algoritmo do PTC2 é descrito em C e faz o uso de pilhas e ponteiros. Em Julia, não
-há todos esses recursos de forma simples, e uma adaptação dessas funções foi feita.
+Here we adopt that the chance to select a ``t`` terminal will be uniform for
+all possible terminals, and the chance to select a function will also follow
+the same logic.
 """
 function PTC2(
     fSet::Vector{Func}, 
@@ -115,36 +121,36 @@ function PTC2(
     maxDepth::Int64,
     expctdSize::Int64)::AbstractNode
 
-    if expctdSize == 1 || maxDepth <= 1 # selecionar terminal aleatório e retorná-lo
+    if expctdSize == 1 || maxDepth <= 1 # select random terminal and return it
         return _create_random_terminal(tSet)
     else
-        f = fSet[Random.rand(1:end)] # Escolher um não terminal para ser a raíz
+        f = fSet[Random.rand(1:end)] # Choose a non-terminal to be the root
 
-        # Criando com posições alocadas e vazias
+        # Creating with allocated and empty positions
         root = InternalNode(f, Array{AbstractNode}(undef, f.arity))
 
-        currSize = 1 # Tamanho atual da árvore
+        currSize = 1 # current tree size
 
-        # Vamos utilizar um array simples para simular a fila aleatória. 
-        # Guardamos tuplas com ("referência" para a posição do filho, profundidade do nó na árvore)
+        # Let's use a simple array to simulate the random queue.
+        # We store tuples with ("reference" to child position, node depth in tree)
         randQueue = Tuple{Function, Int64}[] 
 
-        for i in 1:root.func.arity # simulando ponteiros para atualizar os filhos
+        for i in 1:root.func.arity # simulating pointers to update children
             push!(randQueue, (x -> root.children[i] = x, 1))
         end
 
         while size(randQueue)[1]+currSize < expctdSize && size(randQueue)[1] > 0
             
-            # Pegando nó aleatório e tirando da fila 
+            # Taking out a random node of the queue
             let randNode = Random.rand(1:size(randQueue)[1])
                 nodeUpdater, nodeDepth = randQueue[randNode]
                 deleteat!(randQueue, randNode)
 
-                if nodeDepth >= maxDepth # Sortear terminal e colocar na profundidade máxima
+                if nodeDepth >= maxDepth # Draw terminal and place to maximum depth
                     terminal = _create_random_terminal(tSet)
                     nodeUpdater(terminal)
                     currSize = currSize + true_numberofnodes(terminal)
-                else # Vamos colocar outro nó intermediário e enfileirar seus filhos
+                else # Let's put another intermediate node and queue its children
 
                     f = fSet[Random.rand(1:end)]
                     subtree = InternalNode(f, Array{AbstractNode}(undef, f.arity))
@@ -159,7 +165,8 @@ function PTC2(
             end
         end
 
-        # Preenchendo quem pode ter sobrado após atingir o limite máximo
+        # Filling in who may have not all children after reaching the maximum
+        # size limit
         while size(randQueue)[1] > 0
             let randNode = Random.rand(1:size(randQueue)[1])
                 nodeUpdater, nodeDepth = randQueue[randNode]
@@ -174,8 +181,8 @@ function PTC2(
 end
 
 
-"""
-Função que inicializa uma população de tamanho ```popSize``` utilizando o método _grow_.
+"""Function that initializes a population of size ```popSize``` using the
+_grow_ method.
 
     init_pop_grow(
         fSet::Vector{Func}, 
@@ -185,8 +192,9 @@ Função que inicializa uma população de tamanho ```popSize``` utilizando o m�
         expctdSize::Int64,
         popSize::Int64)::Vector{AbstractNode}
 
-Todas as funções de inicialização recebem os mesmos parâmetros, mas nem todas fazem
-uso de todos eles. Isso é apenas para unificar a chamada da criação de populações
+Every initialization functions take the same parameters, but not all do of them
+makes use of all parameters. This is just to unify the call of initialization
+functions.
 """
 function init_pop_grow(
     fSet::Vector{Func}, 
@@ -200,8 +208,9 @@ function init_pop_grow(
 end
 
 
-"""
-Função que inicializa uma população de tamanho ```popSize``` utilizando o método _full_.
+"""Function that initializes a population of size ```popSize``` using the
+_full_ method.
+
 
     init_pop_full(
         fSet::Vector{Func}, 
@@ -211,8 +220,9 @@ Função que inicializa uma população de tamanho ```popSize``` utilizando o m�
         expctdSize::Int64,
         popSize::Int64)::Vector{AbstractNode}
 
-Todas as funções de inicialização recebem os mesmos parâmetros, mas nem todas fazem
-uso de todos eles. Isso é apenas para unificar a chamada da criação de populações
+Every initialization functions take the same parameters, but not all do of them
+makes use of all parameters. This is just to unify the call of initialization
+functions.
 """
 function init_pop_full(
     fSet::Vector{Func}, 
@@ -226,8 +236,9 @@ function init_pop_full(
 end
 
 
-"""
-Função que inicializa uma população de tamanho ```popSize``` utilizando o método _ramped half-half_.
+"""Function that initializes a population of size ```popSize``` using the
+_ramped half-half_ method.
+
 
     init_pop_ramped(
         fSet::Vector{Func}, 
@@ -237,8 +248,9 @@ Função que inicializa uma população de tamanho ```popSize``` utilizando o m�
         expctdSize::Int64,
         popSize::Int64)
 
-Todas as funções de inicialização recebem os mesmos parâmetros, mas nem todas fazem
-uso de todos eles. Isso é apenas para unificar a chamada da criação de populações
+Every initialization functions take the same parameters, but not all do of them
+makes use of all parameters. This is just to unify the call of initialization
+functions.
 """
 function init_pop_ramped(
     fSet::Vector{Func}, 
@@ -264,8 +276,8 @@ function init_pop_ramped(
 end
 
 
-"""
-Função que inicializa uma população de tamanho ```popSize``` utilizando o método _PTC2_.
+"""Function that initializes a population of size ```popSize``` using the
+_PTC2_ method.
 
     init_pop_PTC2(
         fSet::Vector{Func}, 
@@ -275,8 +287,9 @@ Função que inicializa uma população de tamanho ```popSize``` utilizando o m�
         expctdSize::Int64,
         popSize::Int64)::Vector{AbstractNode}
 
-Todas as funções de inicialização recebem os mesmos parâmetros, mas nem todas fazem
-uso de todos eles. Isso é apenas para unificar a chamada da criação de populações
+Every initialization functions take the same parameters, but not all do of them
+makes use of all parameters. This is just to unify the call of initialization
+functions.
 """
 function init_pop_PTC2(
     fSet::Vector{Func}, 
