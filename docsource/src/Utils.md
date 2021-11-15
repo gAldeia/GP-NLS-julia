@@ -1,16 +1,11 @@
-# Funções de utilidade
+# Auxiliary functions
 
-Implementação de algumas funções auxiliares que são utilizadas 
-para inspecionar e manipular as árvores de forma mais geral.
+Implementation of some auxiliary functions that are used
+to inspect and manipulate trees more generally.
 
-## Tipos e Funções
+## Types and functions
 
 ```@autodocs
 Modules = [GP_NLS]
 Pages   = ["Utils.jl"]
-```
-
-## Índice
-
-```@index
 ```

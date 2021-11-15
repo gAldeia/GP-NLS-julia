@@ -1,9 +1,6 @@
-# Estrutura das árvores
+# Types, sets and functions exported by the module
 
-Para construir as árvores de expressões, são utilizadas as _structs_ definidas
-aqui, que funcionam como um esqueleto das árvores.
-
-## Tipos
+## Types
 
 * [`Func`](@ref)
 * [`Const`](@ref)
@@ -11,13 +8,13 @@ aqui, que funcionam como um esqueleto das árvores.
 * [`WeightedVar`](@ref)
 * [`ERC`](@ref)      
   
-## Conjuntos padrões
+## Default sets
 
 * [`defaultFunctionSet`](@ref)
 * [`defaultConstSet`](@ref)
 * [`defaultERCSet`](@ref)     
 
-## Funções auxiliares
+## Auxiliary functions
 
 * [`evaluate`](@ref)
 * [`getstring`](@ref)
@@ -26,12 +23,8 @@ aqui, que funcionam como um esqueleto das árvores.
 * [`true_numberofnodes`](@ref)
 * [`true_depth`](@ref)        
 
-## Algoritmo evolutivo
+## Genetic Programming algorithm
 
 * [`GP`](@ref)
 * [`fitness`](@ref)
-                                    
-## Índice
-
-```@index
-```
+     

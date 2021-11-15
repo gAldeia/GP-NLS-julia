@@ -1,3 +1,9 @@
+# Author:  Guilherme Aldeia
+# Contact: guilherme.aldeia@ufabc.edu.br
+# Version: 1.0.0
+# Last modified: 15-11-2021 by Guilherme Aldeia
+
+
 using Test
 
 using LinearAlgebra
@@ -9,23 +15,24 @@ using Statistics
 using GP_NLS
 
 
-# Várias verificações são dispensáveis por conta da verificação de tipos do compilador
+# Various checks are unnecessary because of compiler type checking.
 
-@testset "Verificação em Nodes.jl" begin
-    @testset "Nós de funções" begin
+
+@testset "Testing NodeContent.jl" begin
+    @testset "Function nodes" begin
         a = Float64[1., 2., 3.]
 
         for f in defaultFunctionSet
-            # Testar se só temos funções dentro do conjunto padrão
+            # Test if we only have functions within the default set
             @test typeof(f) == Func
 
-            # Testar se recebe um (ou mais) vetor(es) e retorna um único vetor
+            # Test whether it takes one (or more) vector(s) and returns a single vector
             @test typeof(f.func([a for _ in 1:f.arity]...)) == Vector{Float64}
         end
     end
 
-    @testset "Geração de constantes com ERC" begin
-        # Testar geração de constante pelo ERC (ver se ele gera sempre no range)
+    @testset "Constant creation with ERC" begin
+        # see if it always generates in the range
         for i in [1.0, 10.0, 100.0]
             aux_ERC = ERC(-i, i)
             for _ in 1:10000
@@ -35,24 +42,24 @@ using GP_NLS
         end
     end
 
-    # Nós de constante são simples, e nós de variáveis também --- são structs apenas
-    # para guardar valores. Já as que foram testadas envolvem cálculos que ---
-    # caso estejam com bugs --- pode gerar problemas difíceis de encontrar no código.
+    # Constant nodes are simple, and variable nodes too --- they are just structs
+    # to store values. The ones that were tested involve calculations that
+    # can lead to hard-to-find bugs in the code.
 end
 
 
-@testset "Verificação em Trees.jl" begin
-    # Testar subtipos
+@testset "Testing TreeStructure.jl" begin
+    # Testing subtypes
     @test typeof(GP_NLS.InternalNode) == typeof(GP_NLS.AbstractNode)
     @test typeof(GP_NLS.TerminalNode) == typeof(GP_NLS.AbstractNode)
     @test typeof(GP_NLS.AbstractNode) == typeof(GP_NLS.AbstractNode)
 end
 
 
-# Vamos criar uma árvore simples e um toy dataset
+# Let's create a simple tree and a toy dataset
 myprod = GP_NLS.myprod
 
-# Vamos criar esses separados para testes só de constantes e variáveis
+# Let's create these separate for testing only constants and variables
 x1 = GP_NLS.TerminalNode(Var("x1", 1))
 c1 = GP_NLS.TerminalNode(Const(1.0))
 
@@ -77,93 +84,93 @@ toy_X = [
 toy_y = 1.25*toy_X[:, 1] - -1.25*toy_X[:, 2]
 
 
-@testset "Verificação em Utils.jl" begin    
-    # Testar o evaluate num toy dataset
-    @testset "Vetorização do evaluate" begin
+@testset "Testing Utils.jl" begin    
+    #Test evaluate on a toy dataset
+    @testset "Evaluate vectorization" begin
         @test evaluate(test_tree, toy_X) == [2., 4., -2., -4.]
         
-        # Deve sempre receber uma matriz. No caso de vetor, precisamos do reshape
+        # It must always receive an array. In the case of vector, we need the reshape
         @test evaluate(test_tree, reshape(toy_X[1,:], (1, length(toy_X[1,:])))) == [2.] 
         
-        # Evaluate em constante deve retornar vetor com mesmo número de observações
+        # Evaluation of a constant must return a vector with same number of observations
         @test evaluate(c1, toy_X) == repeat([c1.terminal.value], size(toy_X, 1))
 
-        # Evaluate na variável deve retornar a coluna da variável
+        # Evaluate on variable must return the column of the variable
         @test evaluate(x1, toy_X) == toy_X[:, 1]
     end
     
-    @testset "Teste de cópia de árvores" begin
-        # Pegar referência da string da árvore original
+    @testset "Tree copy" begin
+        # Get string reference from original tree
         test_tree_str  = getstring(test_tree)
         test_tree_copy = GP_NLS.copy_tree(test_tree)
 
-        # Mudando os filhos (struct é imutável, mas a lista pode ter elementos modificados)
+        # Changing the children (struct is immutable, but list can have modified elements)
         test_tree_copy.children[1] = x1
 
-        # Vendo se a referência ainda retorna a mesma string
+        # Seeing if the reference still returns the same string (it should)
         @test test_tree_str == getstring(test_tree)
 
-        # Vendo que a cópia modificada é diferente
+        # Seeing that the modified copy is different of the original
         @test test_tree_str != getstring(test_tree_copy)
 
-        # Vamos salvar a string da cópia e modificar de novo colocando a árvore original como galho
+        # Let's save the copied tree string and modify it again,
+        # putting the original tree as a branch on it
         test_tree_copy_str = getstring(test_tree_copy)
         test_tree_copy.children[2] = test_tree
 
         @test test_tree_copy_str != getstring(test_tree_copy)
         @test test_tree_str != getstring(test_tree_copy)
 
-        # Original também não deve ter sido afetada
+        # Original must not have been affected either.
         @test test_tree_str == getstring(test_tree)
     end
 
-    @testset "Percorrendo árvores" begin
-        # Which children: deve funcionar sem dar erro desde que p <= número de nós
-        for i in 1:(numberofnodes(test_tree)-1) #subtrair 1 pois são os filhos sem considerar ele
+    @testset "Traversing trees" begin
+        #Which children: should work without error if p <= number of nodes
+        for i in 1:(numberofnodes(test_tree)-1) # subtract 1 because it's the children without considering it
             @test typeof(GP_NLS.which_children(i, test_tree.children)) <:
                   Tuple{Integer, GP_NLS.AbstractNode}
         end
         
-        # Get branch, deve funcionar como o anterior
-        for i in 1:(numberofnodes(test_tree)-1) #subtrair 1 pois são os filhos sem considerar ele
+        # Get branch, should work like above
+        for i in 1:(numberofnodes(test_tree)-1) # subtract 1 because it's the children without considering it
             @test typeof(GP_NLS.get_branch_at(i, test_tree)) <:
                   GP_NLS.AbstractNode
         end
     end
 
-    # Testando changeat e change_children
-    @testset "Modificando subárvores" begin
-        # Criar duas cópias de sample_tree e fazer uma ser subárvore da outra
+    # Testing changeat and change_children
+    @testset "Modifying subtrees" begin
+        # Create two copies of sample_tree and make one a subtree of the other
         test_tree_1 = GP_NLS.copy_tree(test_tree)
         test_tree_2 = GP_NLS.copy_tree(test_tree)
         
-        # Vamos ver se as referências originais continuam iguais
+        # Let's see if the original references remain the same
         test_tree_1_str = getstring(test_tree_1)
         test_tree_2_str = getstring(test_tree_2)
 
-        # Aqui elas devem ser iguais
         @test test_tree_1_str == test_tree_2_str
 
-        # Vamos mudar um nó na profundidade máxima, sabemos que ali irá usar 
-        # tanto change_children quanto change_at
+        # Let's change a node at maximum depth, we know it will use there
+        # both change_children and change_at functions
         test_tree_changed = GP_NLS.change_at!(
             numberofnodes(test_tree_1)-1,
             test_tree_1,
             test_tree_2
         )
 
-        # Vamos percorrer a nova árvore para ver se não veio quebrada
-        for i in 1:(numberofnodes(test_tree_changed)-1) #subtrair 1 pois são os filhos sem considerar ele
+        # Let's go through the new tree to see if it didn't come broken
+        for i in 1:(numberofnodes(test_tree_changed)-1) # subtract 1 because it's the children without considering it
             @test typeof(GP_NLS.get_branch_at(i, test_tree_changed)) <:
                   GP_NLS.AbstractNode
         end
 
-        # Vendo se as referências se alteraram
+        # Seeing if references have changed
         @test test_tree_1_str == test_tree_2_str
         @test test_tree_1_str == getstring(test_tree_1)
         @test test_tree_2_str == getstring(test_tree_2)
 
-        # Vamos ver se alterações na nova árvore modificam as originais
+        # Let's see if changes to the new tree modify the originals
         test_tree_changed_str = getstring(test_tree_changed)
         test_tree_changed.children[1] = test_tree_1
         test_tree_changed.children[2] = test_tree_2
@@ -175,35 +182,36 @@ toy_y = 1.25*toy_X[:, 1] - -1.25*toy_X[:, 2]
         @test test_tree_changed_str != getstring(test_tree_changed)
     end
 
-    # depth e numberofnodes são bem simples, não serão testadas
+    # depth and numberofnodes are very simple, will not be tested
 end
 
 
-@testset "Verificação LsqOptimization.jl" begin
-    # Testar find_const_nodes (aqui sabemos quantos nós são)
+@testset "Testing LsqOptimization.jl" begin
+    # Test find_const_nodes (here we know how many nodes there are)
     test_tree_lsq     = GP_NLS.copy_tree(test_tree)
     test_tree_lsq_str = getstring(test_tree_lsq)
 
-    @testset "Encontrar nós constantes" begin
+    @testset "Finding constant nodes" begin
         const_nodes = GP_NLS.find_const_nodes(test_tree_lsq)
         @test const_nodes[1].terminal.value == 1.0
         @test const_nodes[2].terminal.value == -1.0
     end
 
-    @testset "Testar substituir nós constantes por um novo" begin
-        # Testar replace
+    @testset "Replacing consts with new values" begin
+        # Testing replace
         test_tree_replace = GP_NLS.replace_const_nodes(
             test_tree_lsq, [2.0, -2.0]
         )
 
         @test "-(myprod(x1, 2.0), myprod(-2.0, x2))" == getstring(test_tree_replace)
 
-        # Vendo se a referência original continua intacta (deveria)
+        # Seeing if the original reference is still intact (should)
         @test getstring(test_tree_lsq) == test_tree_lsq_str
     end
 
-    # Testar adaptate (ver número de nós e se tem 2 const a mais, e profundidade)
-    @testset "Adaptação da árvore" begin
+    # Test adapte (check if number of nodes, and if you have 2 more consts, and 
+    # dedpth also increased)
+    @testset "Tree adaptation" begin
         test_tree_H, test_tree_p0, test_tree_adapted = GP_NLS.adaptate_tree(test_tree)
 
         @test numberofnodes(test_tree_adapted) == numberofnodes(test_tree) + 4
@@ -212,10 +220,10 @@ end
 end
 
 
-@testset "Funções do algoritmo evolutivo" begin
-    # Usar os conjuntos padrões para esses testes. OBS: importante prestar atenção
-    # no tipo dos terminais: mesmo que não utilizemos todos os símbolos, o array
-    # esperado é do tipo Union{Var, Const, ERC} pelos métodos.
+@testset "Evolutionary algorithm functions" begin
+    # Using the default sets for these tests. NOTE: it is important to pay
+    # attention in the type of terminals: even if we don't use all the
+    # symbols, the expected array is of type Union{Var, Const, ERC}.
     fSet = defaultFunctionSet
 
     tSet = Vector{Union{Var, WeightedVar, Const, ERC}}(vcat(
@@ -225,73 +233,67 @@ end
         WeightedVar[WeightedVar("x$(i)", i) for i in 1:2]
     ))
     
-    @testset "Inicializações de árvores PTC2" begin  
-        # Vamos gerar controlando por número de nós
+    @testset "PTC2 Initialization" begin  
         random_pop = GP_NLS.init_pop_PTC2(fSet, tSet, 1, 10, 10, 5000)
 
         @test size(random_pop, 1) == 5000
-          
-        for p in random_pop
-            # Ver se respeitam restrições (e se foi possível percorrer a árvore sem erro)
 
-            # PTC2 garante no máximo 1 de profundidade além do permitido
+        # check if they respect restrictions (and if it was possible to traverse
+        # the tree without error)          
+        for p in random_pop
+            # PTC2 guarantees a maximum of 1 depth beyond maximum allowed
             @test 1 <= depth(p) <= 10 + 1
 
-            # PTC2 garante que terá no máximo a maior aridade das funções além do permitido
+            # PTC2 guarantees that it will have at most the greatest arity of
+            # the functions beyond maximum allowed
             @test 1 <= numberofnodes(p) <= 50 + 2
         end        
     end
 
-    @testset "Inicializações de árvores ramped half-half" begin  
-        # Vamos gerar controlando por número de nós
+    @testset "Ramped half-half initialization" begin  
         random_pop = GP_NLS.init_pop_ramped(fSet, tSet, 1, 5, 10, 5000)
 
         @test size(random_pop, 1) == 5000
-          
+
+        # check if they respect restrictions (and if it was possible to traverse
+        # the tree without error)            
         for p in random_pop
-            # Ver se respeitam restrições (e se foi possível percorrer a árvore sem erro)
 
-            # PTC2 garante no máximo 1 de profundidade além do permitido
             @test 1 <= depth(p) <= 5 + 1
-
-            # PTC2 garante que terá no máximo a maior aridade das funções além do permitido
             @test 1 <= numberofnodes(p) <= 50 + 2
         end        
     end
 
-    # Vamos gerar com ramped para o resto (aqui controlamos com profundidade)
+    # Let's generate a ramped halfhalf pop for the rest of the tests 
     random_pop = GP_NLS.init_pop_ramped(fSet, tSet, 1, 5, 10, 5000)
-    
-    # Vamos salvar string da população inicial e comparar após crossover e mutação
+
+    # Saving strings from initial population to later compare
+    # with new trees generated by crossover and mutation
     random_pop_strs = [getstring(p) for p in random_pop]
 
-    @testset "Inicializações de árvores half-half" begin 
+    @testset "Initial population to test mutation and crossover" begin 
         @test size(random_pop, 1) == 5000
 
         for p in random_pop
-            # Ver se respeitam restrições (e se foi possível percorrer a árvore sem erro)
             @test 1 <= depth(p) <= 5
-
-            # profundidade máxima é 2^(depth)
             @test 1 <= numberofnodes(p) <= 2^5
         end        
     end
 
-    @testset "Testando avaliação do fitness" begin
-        for p in random_pop
-            # Testar fitness de uma expressão no toy dataset.
+    @testset "Fitness evaluation" begin
+        for p in random_pop# Test fitness of an expression in the toy dataset
             @test typeof(fitness(p, toy_X, toy_y)) <: Real 
 
-            # Testar passando NaN
+            # Test with NaN values
             @test fitness(p, toy_X, [NaN, 1.0, 1.0, 1.0]) == Inf
 
-            # Testar passando Inf
+            # Test with inf values
             @test fitness(p, toy_X, [1.0, 1.0, Inf, 1.0]) == Inf
         end
     end
 
-    @testset "Teste do crossover" begin
-        children = [ # Aplicando crossover
+    @testset "Crossover" begin
+        children = [
             GP_NLS.crossover(
                 random_pop[Random.rand(1:end)],
                 random_pop[Random.rand(1:end)],
@@ -299,50 +301,40 @@ end
                 2^5
             ) for _ in 1:5000]
 
+        # See if they respect restrictions (and if it is possible to
+        # traverse the tree without error)
         for c in children
-            # Ver se respeitam restrições (e se foi possível percorrer a árvore sem erro)
             @test 1 <= depth(c) <= 5
-        end
-
-        # Ver se a árvore avalia
-        for c in children
             @test typeof(fitness(c, toy_X, toy_y)) <: Real
         end
 
-        # Ver se referência original é alterada
+        # See if original reference is changed
         for (p, p_str) in zip(random_pop, random_pop_strs)
             @test getstring(p) == p_str 
         end
     end
 
-    @testset "Teste da mutação" begin
+    @testset "Mutation" begin
         children = [
             GP_NLS.mutation!(
                 random_pop[i],
-                5,              # Profundidade máxima permitida
-                2^5,            # Número máximo de nós permitidos
+                5,              # Maximum allowed depth
+                2^5,            # Maximum number of nodes allowed
                 fSet,
                 tSet,
                 1.0
             ) for i in 1:5000]
 
+        # See if they respect restrictions (and if it is possible to
+        # traverse the tree without error)
         for c in children
-            # Ver se respeitam restrições (e se foi possível percorrer a árvore sem erro)
-            #println(getstring(c))
-            @test 1 <= depth(c) <= 6 #o PTC2 tem chance de ter 1 a mais de profundidade
-        end
-
-        # Ver se a árvore avalia
-        for c in children
+            @test 1 <= depth(c) <= 6 # PTC2 has a chance of creating a tree with (max depth + 1)
             @test typeof(fitness(c, toy_X, toy_y)) <: Real
         end
 
-        # Ver se referência original é alterada
+        # See if original reference is changed
         for (p, p_str) in zip(random_pop, random_pop_strs)
             @test getstring(p) == p_str 
         end
     end
-
-    # Torneio não tem muito o que testar, e o GA é complexo e estocástico demais
-    # para testes muito específicos.
 end

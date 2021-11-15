@@ -1,16 +1,10 @@
-# Avaliação de árvores
+# Tree Evaluation
 
-Funções que fazem a avaliação de uma árvore para um conjunto de dados e calculam
-seu fitness.
+Functions that evaluate a tree for a given dataset and calculates its fitness.
 
-## Tipos e Funções
+## Types and functions
 
 ```@autodocs
 Modules = [GP_NLS]
 Pages   = ["Evaluation.jl"]
-```
-
-## Índice
-
-```@index
 ```

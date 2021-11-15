@@ -1,16 +1,18 @@
-# Documentação de GP_NLS
+# GP_NLS in Julia Documentation
 
-Implementação de um algoritmo de regressão simbólica com representação por árvores
-e possibilidade de uso de um método de otimização não linear para ajuste dos coeficientes.
+Implementation of a Symbolic Regression Algorithm with the Tree Representation
+and the possibility of using a non-linear optimization method to adjust the
+coefficients of  the trees during the evolutionary process.
 
-## Sobre
+## About
 
-## Funções visíveis pelo import
+TODO.
 
-As funções que são de fato exportadas estão indicadas na barra de navegação.
+## Functions visible by import
+The functions that are actually exported are indicated in the navigation bar.
 
 ## Funções internas
 
-A biblioteca conta com algumas funções internas auxiliares que seu uso não é
-recomendado. Todas as implementações encontram-se listadas nos módulos da 
-biblioteca, mas apenas algumas são exportadas para fora do pacote.
+The module has some built-in auxiliary functions that its external use is not
+recommended. All implementations are listed in the modules of the
+library, but only some functions are exported outside the package.

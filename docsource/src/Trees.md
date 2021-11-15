@@ -1,16 +1,12 @@
-# Estrutura das árvores
+# Tree structural nodes
 
-Para construir as árvores de expressões, são utilizadas as _structs_ definidas
-aqui, que funcionam como um esqueleto das árvores.
+To build the expression trees, the defined _structs_ are used.
+Those serves as the backbone of the tree, where every node has a different
+content.
 
-## Tipos e Funções
+## Types and functions
 
 ```@autodocs
 Modules = [GP_NLS]
 Pages   = ["TreeStructure.jl"]
-```
-
-## Índice
-
-```@index
 ```

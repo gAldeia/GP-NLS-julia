@@ -1,16 +1,11 @@
-# Inicialização da população
+# Population Initialization
 
-Implementação de diferentes funções para criar árvores, e funções que
-criam uma população inteira
+Implementation of different functions to initialize individual trees, as well 
+as functions to create an entire population.
 
-## Tipos e Funções
+## Types and functions
 
 ```@autodocs
 Modules = [GP_NLS]
 Pages   = ["Initialization.jl"]
-```
-
-## Índice
-
-```@index
 ```

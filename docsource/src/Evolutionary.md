@@ -1,15 +1,10 @@
-# Algoritmo evolutivo
+# Genetic Programming algorithm
 
-Implementação da mutação, crossover e GP.
+Mutation, crossover and GP implementation.
 
-## Tipos e Funções
+## Types and functions
 
 ```@autodocs
 Modules = [GP_NLS]
 Pages   = ["Evolutionary.jl"]
-```
-
-## Índice
-
-```@index
 ```

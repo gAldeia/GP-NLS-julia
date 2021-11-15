@@ -1,16 +1,11 @@
-# Conteúdo dos nós das árvores
+# Node contents
 
-Toda a representação por árvores começa aqui. Essas _Structs_ são utilizadas
-como conteúdo dos nós da árvore (e não como nós diretos).
+All representation by trees starts here. These _Structs_ are used
+as content of the nodes of the tree (and not as direct nodes).
 
-## Tipos e Funções
+## Types and functions
 
 ```@autodocs
 Modules = [GP_NLS]
 Pages   = ["NodeContent.jl"]
-```
-
-## Índice
-
-```@index
 ```

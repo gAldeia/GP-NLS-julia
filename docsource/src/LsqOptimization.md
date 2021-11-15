@@ -1,17 +1,12 @@
-# Otimização não linear de coeficientes
+# Non-linear Least Squares optimization
 
-Implementação de funções auxiliares e do método de otimização não-linear
-de coeficientes. Todas as funções declaradas aqui são de uso interno da 
-biblioteca.
+Implementation of auxiliary functions and the nonlinear optimization method
+of coefficients. All functions declared here are for internal use by
+the module.
 
-## Tipos e Funções
+## Types and functions
 
 ```@autodocs
 Modules = [GP_NLS]
 Pages   = ["Evolutionary.jl"]
-```
-
-## Índice
-
-```@index
 ```
