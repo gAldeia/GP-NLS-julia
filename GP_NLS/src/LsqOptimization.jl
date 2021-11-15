@@ -208,14 +208,14 @@ function apply_local_opt(
 
     try
         # autodiff have different modes: ["forwarddiff", "finiteforward"]
-        # (default is _finite differences_)
+        # (default is _finite differences_, this works fine most of the time)
         fit = curve_fit(
             node_H,
             X,
             y,
             node_p0,
-            maxIter=7,
-            autodiff=:forward 
+            maxIter=10,
+            autodiff=:finiteforward 
         )
         
         theta = fit.param
@@ -232,7 +232,7 @@ function apply_local_opt(
         # derivatives are not continuous in some point.
         # Let's return the function without adjusting the coefficients then.
 
-        #print(err)
+        print(err)
         if keep_linear_transf_box
             return node_adapted
         else

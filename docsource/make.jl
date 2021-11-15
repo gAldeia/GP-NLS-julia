@@ -9,7 +9,6 @@ makedocs(
     build="../docs",
     pages = [
         "GP_NLS" => "index.md",
-        "Types and functions exported" => "Exported.md",
         "All source code" => [
             "Node contents" => "Nodes.md",
             "Tree structures" => "Trees.md",

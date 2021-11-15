@@ -78,16 +78,19 @@ toy_X = [
     1.  1.;
     2.  2.;
    -1. -1.;
-   -2. -2.
+   -2. -2.;
+   -5.  5.;
+    10. 5.;
+    7.  5.5; 
 ]
 
-toy_y = 1.25*toy_X[:, 1] - -1.25*toy_X[:, 2]
+toy_y = 1.25*toy_X[:, 1] -1.25*toy_X[:, 2]
 
 
 @testset "Testing Utils.jl" begin    
     #Test evaluate on a toy dataset
     @testset "Evaluate vectorization" begin
-        @test evaluate(test_tree, toy_X) == [2., 4., -2., -4.]
+        @test evaluate(test_tree, toy_X) == [2.0, 4.0, -2.0, -4.0, 0.0, 15.0, 12.5]
         
         # It must always receive an array. In the case of vector, we need the reshape
         @test evaluate(test_tree, reshape(toy_X[1,:], (1, length(toy_X[1,:])))) == [2.] 
@@ -217,6 +220,30 @@ end
         @test numberofnodes(test_tree_adapted) == numberofnodes(test_tree) + 4
         @test depth(test_tree_adapted) == depth(test_tree) + 2
     end
+
+    # We know that the toy data set y = 1.25*toy_X[:, 1] -1.25*toy_X[:, 2].
+    # Let's see if the adjustment finds the correct values for a linear tree
+    @testset "Tree coeffs adjustment" begin
+        # Not keeping the linear transformation box
+        tree_opt = GP_NLS.apply_local_opt(
+            GP_NLS.copy_tree(test_tree), toy_X, toy_y, false)
+
+        #print(getstring(tree_opt))
+
+        # This is the nodes, we need to extract the values
+        const_nodes = GP_NLS.find_const_nodes(tree_opt)
+        const_values = [
+            typeof(c.terminal) == GP_NLS.Const ?
+                c.terminal.value : c.terminal.weight
+            for c in const_nodes]
+        
+        #print(const_values)
+
+        # It should find two coefficients, both "close" to 1.25 (lsq is using
+        # just few iterations, let's not expect a really small error. A
+        # tolerance sof 5e-2 should be ok)
+        @test all(x -> isapprox(x..., rtol=5e-2), zip([1.25, 1.25], const_values))
+    end 
 end
 
 
