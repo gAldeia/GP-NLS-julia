@@ -25,7 +25,7 @@ The genetic programming algorithm starts with a random population of solutions, 
 
 GP-NLS creates symbolic trees but expands them by adding an intercept, slope, and a coefficient to every variable. The new free parameters are then adjusted using the non-linear optimization method called Levenberg-Marquardt.
 
-![GP-NLS tree example](./assets/expanded_tree.jpg)
+![GP-NLS tree example](./expanded_tree.jpg)
 
 -----
 
