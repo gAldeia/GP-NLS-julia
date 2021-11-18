@@ -138,8 +138,8 @@ end
 # Let's create constant functions that we know are needed for adaptation
 # used in the optimization process. Those correspond to the offset and scale
 # nodes of the GP-NLS
-const adapt_sum  = Func(+, 2)
-const adapt_prod = Func(prod, 2)
+const adapt_sum  = Func((args...) -> args[1] .+ args[2], 2, "+")
+const adapt_prod = Func((args...) -> args[1] .* args[2], 2, "*")
 
 
 """Function that receives a tree and makes the necessary adaptations to be

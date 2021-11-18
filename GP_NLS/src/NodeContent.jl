@@ -18,6 +18,11 @@ The function's representation as a _string_ is inferred from the name of the
 function passed, and when this node is used to create a node of a tree,
 it will have ``a`` children.
 
+Optionally, you can give a name to the function
+by using the 3 parameters constructor:
+
+    Func(f::Function, a::Int64, str_rep::String)
+
 When creating new functions, protected operators must not be used. The 
 non-linear optimization method uses autodiff to differentiate the tree, and
 complex functions can be problematic to automatically differentiate.
@@ -28,6 +33,7 @@ struct Func
     str_rep :: String
 
     Func(f::Function, a::Int64) = new(f, a, string(f))
+    Func(f::Function, a::Int64, str_rep::String) = new(f, a, str_rep)
 end
 
 
@@ -131,44 +137,37 @@ end
 # For ease of use and to serve as an example, some default sets will be provided.
 
 # We declare it as const to prevent them from changing the value, and make it clear that they shouldn't.
-const prod(args...)    = args[1] .* args[2]
-const div(args...)     = args[1] ./ args[2] # Note that it is not protected division!
-const sin(args...)     = sin.(args[1])
-const cos(args...)     = cos.(args[1])
-const sqrtabs(args...) = sqrt.(abs.(args[1]))
-const sqrt(args...)    = sqrt.(args[1])
-const square(args...)  = args[1].^2
-const exp(args...)     = exp.(args[1])
-const log(args...)     = log.(args[1])
-
-#sin(args) = sin.(args) # It would be possible to take only one argument if it's unary, but it's better to keep the default
 
 """Default functions set
 
-    Func(+, 2),
-    Func(-, 2),
-    Func(prod, 2),
-    Func(div, 2),
+    Func((args...) -> args[1] .+ args[2], 2, "+"),
+    Func((args...) -> args[1] .- args[2], 2, "-"),
+    Func((args...) -> args[1] .* args[2], 2, "*"),
+    Func((args...) -> args[1] ./ args[2], 2, "/"), # Notice that it is not protected division!
 
-    Func(square, 1),
-    Func(sqrt, 1),
-    Func(exp, 1),
-    Func(log, 1)
+    Func((args...) -> args[1].^2, 1, "squared"),
+    Func((args...) -> sqrt.(args[1]), 1, "sqrt"),
+    Func((args...) -> exp.(args[1]), 1, "exp"),
+    Func((args...) -> log.(args[1]), 1, "log"),
+
+    Func((args...) -> sin.(args[1]), 1, "sin"),
+    Func((args...) -> cos.(args[1]), 1, "cos"),
+    Func((args...) -> args[1].^2, 1, "sqrt.abs"),
 """
-defaultFunctionSet = Func[ # Defining a set of standard functions (same as used in the original reference)
-    Func(+, 2),
-    Func(-, 2),
-    Func(prod, 2),
-    Func(div, 2),
+const defaultFunctionSet = Func[ # Defining a set of standard functions (same as used in the original reference)
+    Func((args...) -> args[1] .+ args[2], 2, "+"),
+    Func((args...) -> args[1] .- args[2], 2, "-"),
+    Func((args...) -> args[1] .* args[2], 2, "*"),
+    Func((args...) -> args[1] ./ args[2], 2, "/"), # Notice that it is not protected division!
 
-    Func(square, 1),
-    Func(sqrt, 1),
-    Func(exp, 1),
-    Func(log, 1),
+    Func((args...) -> args[1].^2, 1, "squared"),
+    Func((args...) -> sqrt.(args[1]), 1, "sqrt"),
+    Func((args...) -> exp.(args[1]), 1, "exp"),
+    Func((args...) -> log.(args[1]), 1, "log"),
 
-    #Func(sin, 1),
-    #Func(cos, 1),
-    #Func(sqrtabs, 1),
+    Func((args...) -> sin.(args[1]), 1, "sin"),
+    Func((args...) -> cos.(args[1]), 1, "cos"),
+    Func((args...) -> args[1].^2, 1, "sqrt.abs"),
 ]
 
 """Default const set
@@ -177,7 +176,7 @@ defaultFunctionSet = Func[ # Defining a set of standard functions (same as used 
     Const(1.0),
     Const(-1.0)
 """
-defaultConstSet = Const[
+const defaultConstSet = Const[
     Const(3.1415),
     Const(1.0),
     Const(-1.0)
@@ -188,6 +187,6 @@ defaultConstSet = Const[
     ERC(-1.0, 1.0)
 
 """
-defaultERCSet = ERC[
+const defaultERCSet = ERC[
     ERC(-1.0, 1.0)
 ]

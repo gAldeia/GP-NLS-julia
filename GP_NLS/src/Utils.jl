@@ -5,8 +5,12 @@
 
 
 """Function that takes any node of a tree (```AbstractNode```) and recursively
-builds a _string_ representation of the tree, where functions are always denoted
-in prefixed notation, with arguments in parentheses.
+builds a _string_ representation of the tree. When creating the string
+representation for a function, if it is unary, then the string will be created
+with ``node.func.str_rep(child)``, otherwise it will be created as:
+``(child1.str_rep node.func.str_rep child2.str_rep node.func.str_rep ...)``
+(intercalating the children string representations with the function string
+representation).
 
     getstring(node::AbstractNode)::String
 
@@ -18,9 +22,14 @@ function getstring(node::TerminalNode)::String
 end
 
 function getstring(node::InternalNode)::String
-    child_str_rep = join([getstring(c) for c in node.children], ", ")
+    child_str_reps = [getstring(c) for c in node.children]
 
-    return "$(node.func.str_rep)($(child_str_rep))"
+    if node.func.arity == 1
+        return "$(node.func.str_rep)($(join(child_str_reps, ", ")))"
+    else
+        return "($(join(child_str_reps, node.func.str_rep)))"
+    end
+
 end
 
 

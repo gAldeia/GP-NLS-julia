@@ -54,6 +54,11 @@ using GP_NLS
 
 The first time you import, Julia wil precompile all files, this can take a while.
 
+## Minimal usage:
+
+There is a simple pluto notebook showing how to load a data set and
+execute the GP algorithm for symbolic regression inside ``./examples``.
+
 ## Testing:
 
 inside ``.GP-NLS`` folder (which contains the implementation of GP-NLS for
@@ -72,7 +77,31 @@ Then you can run the tests:
 test
 ```
 
-### Building the docs:
+## Benchmarking:
+
+There are tree scripts to benchmark different ways of creating/optimizing
+the constants in the expression trees. You can execute the experiments 
+for a list of datasets with the scripts inside the ``./experiments`` folder.
+
+For example, to test the GP-NLS coefficient optimization
+for the ``airfoil`` and ``cars`` data set:
+
+```bash
+julia LsqOptExperiment.jl airfoil cars
+```
+
+The experiment script will perform 30 executions for the data set, and the
+results are saved inside ``./experiments/results``. To further analyse the
+results, you can run the ``post_hoc_analysis.jl`` script (which is a pluto
+notebook):
+
+```bash
+julia post_hoc_analysis.jl
+```
+
+and the plots comparing the methods will be saved in ``./experiments/plots``.
+
+## Building the docs:
 
 You need to have ``Documenter``. First, install it using the package manager:
 
