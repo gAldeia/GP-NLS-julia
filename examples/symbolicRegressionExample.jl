@@ -67,7 +67,7 @@ end;
 with_terminal() do
 	println("Terminal nodes:")
 	for t in terminalSet
-		println("\t - $(t)")
+		println(" - $(t)")
 	end
 end
 
@@ -75,7 +75,7 @@ end
 with_terminal() do
 	println("Function nodes:")
 	for f in functionSet
-		println("\t - $(f)")
+		println(" - $(f)")
 	end
 end
 

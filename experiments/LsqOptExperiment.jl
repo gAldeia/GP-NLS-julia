@@ -55,7 +55,7 @@ for df_name in df_names
     ]
     
     # Finally, the terminals will be the junction of constants, erc and variables
-    terminalSet = Array{Union{Const, Var, WeightedVar, ERC}}(vcat(constSet, varSet))
+    terminalSet = Array{Union{Const, Var, WeightedVar, ERC}}(vcat(ERCSet, varSet))
 
     # Filtering results file to see how many runs we have
     df_filtro = df_results[df_results.Dataset .== df_name, :]
