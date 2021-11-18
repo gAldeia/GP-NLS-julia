@@ -131,44 +131,44 @@ end
 # For ease of use and to serve as an example, some default sets will be provided.
 
 # We declare it as const to prevent them from changing the value, and make it clear that they shouldn't.
-const myprod(args...)    = args[1] .* args[2]
-const mydiv(args...)     = args[1] ./ args[2] # Note that it is not protected division!
-const mysin(args...)     = sin.(args[1])
-const mycos(args...)     = cos.(args[1])
-const mysqrtabs(args...) = sqrt.(abs.(args[1]))
-const mysqrt(args...)    = sqrt.(args[1])
-const mysquare(args...)  = args[1].^2
-const myexp(args...)     = exp.(args[1])
-const mylog(args...)     = log.(args[1])
+const prod(args...)    = args[1] .* args[2]
+const div(args...)     = args[1] ./ args[2] # Note that it is not protected division!
+const sin(args...)     = sin.(args[1])
+const cos(args...)     = cos.(args[1])
+const sqrtabs(args...) = sqrt.(abs.(args[1]))
+const sqrt(args...)    = sqrt.(args[1])
+const square(args...)  = args[1].^2
+const exp(args...)     = exp.(args[1])
+const log(args...)     = log.(args[1])
 
-#mysin(args) = sin.(args) # It would be possible to take only one argument if it's unary, but it's better to keep the default
+#sin(args) = sin.(args) # It would be possible to take only one argument if it's unary, but it's better to keep the default
 
 """Default functions set
 
     Func(+, 2),
     Func(-, 2),
-    Func(myprod, 2),
-    Func(mydiv, 2),
+    Func(prod, 2),
+    Func(div, 2),
 
-    Func(mysquare, 1),
-    Func(mysqrt, 1),
-    Func(myexp, 1),
-    Func(mylog, 1)
+    Func(square, 1),
+    Func(sqrt, 1),
+    Func(exp, 1),
+    Func(log, 1)
 """
 defaultFunctionSet = Func[ # Defining a set of standard functions (same as used in the original reference)
     Func(+, 2),
     Func(-, 2),
-    Func(myprod, 2),
-    Func(mydiv, 2),
+    Func(prod, 2),
+    Func(div, 2),
 
-    Func(mysquare, 1),
-    Func(mysqrt, 1),
-    Func(myexp, 1),
-    Func(mylog, 1),
+    Func(square, 1),
+    Func(sqrt, 1),
+    Func(exp, 1),
+    Func(log, 1),
 
-    #Func(mysin, 1),
-    #Func(mycos, 1),
-    #Func(mysqrtabs, 1),
+    #Func(sin, 1),
+    #Func(cos, 1),
+    #Func(sqrtabs, 1),
 ]
 
 """Default const set

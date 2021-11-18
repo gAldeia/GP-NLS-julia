@@ -1,6 +1,4 @@
-using Documenter
-
-using GP_NLS
+using Documenter, GP_NLS
 
 makedocs(
     #source="GP_NLS/src",
@@ -8,16 +6,15 @@ makedocs(
     repo="https://github.com/gAldeia/GP-NLS-julia",
     build="../docs",
     pages = [
-        "GP_NLS" => "index.md",
-        "All source code" => [
-            "Node contents" => "Nodes.md",
-            "Tree structures" => "Trees.md",
-            "Utility functions" => "Utils.md",
-            "Tree evaluation" => "Evaluation.md",
-            "Population initialization" => "Initialization.md",
-            "The GP Algorithm" => "Evolutionary.md",
-            "Non-linear optimization" => "LsqOptimization.md",
-        ]
-    ]    
+        "GP_NLS in Julia" => "index.md",
+        "Documentation" => [
+            "Data Types" => "exported/datatypes.md",
+            "Default sets" => "exported/defaultsets.md",
+            "Auxiliary Functions" => "exported/auxiliaryfunctions.md",
+            "Genetic Programming algorithm" => "exported/gp.md"
+        ],
+        "Auxiliary functions (unexported)" => "unexported.md"
+    ],
+    doctest = true
 )
 

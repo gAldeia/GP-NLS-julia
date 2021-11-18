@@ -91,10 +91,10 @@ with_terminal() do
 
 		# From this point every argument should be named and are optional
 		minDepth               = 1,                 
-		maxDepth               = 10 - 2 - 1,        
-		maxSize                = 75 - 4,             
-		popSize                = 250,                
-		gens                   = 250,                   
+		maxDepth               = 5 - 2 - 1,        
+		maxSize                = 25 - 4,             
+		popSize                = 100,                
+		gens                   = 100,                   
 		mutationRate           = 0.05,          
 		elitism                = true,               
 		verbose                = false,              

@@ -139,7 +139,7 @@ end
 # used in the optimization process. Those correspond to the offset and scale
 # nodes of the GP-NLS
 const adapt_sum  = Func(+, 2)
-const adapt_prod = Func(myprod, 2)
+const adapt_prod = Func(prod, 2)
 
 
 """Function that receives a tree and makes the necessary adaptations to be
@@ -232,7 +232,7 @@ function apply_local_opt(
         # derivatives are not continuous in some point.
         # Let's return the function without adjusting the coefficients then.
 
-        print(err)
+        #print(err)
         if keep_linear_transf_box
             return node_adapted
         else

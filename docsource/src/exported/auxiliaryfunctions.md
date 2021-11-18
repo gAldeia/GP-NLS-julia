@@ -3,9 +3,10 @@
 Implementation of some auxiliary functions that are used
 to inspect and manipulate trees more generally.
 
-## Types and functions
+## Functions
 
 ```@autodocs
 Modules = [GP_NLS]
+Private = false
 Pages   = ["Utils.jl"]
 ```
