@@ -126,7 +126,7 @@ To use canonic GP, just disable ```lm_optimization``` and choose one of
         X::Matrix{Float64}, 
         y::Vector{Float64},
         fSet::Vector{Func},
-        tSet::Vector{Union{Var, WeightedVar, Const, ERC}},
+        tSet::Vector{Union{Var, WeightedVar, Const, ERC}};
         minDepth::Int64        = 1,
         maxDepth::Int64        = 5,
         maxSize::Int64         = 25,

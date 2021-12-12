@@ -20,7 +20,7 @@ if size(ARGS, 1) > 0
         println("Running now for datasets $(df_names)")
     end
 else
-    println("Executando todos os datasets sequencialmente ($(df_names))")
+    println("Executing 30 experiments for the data sets $(df_names)")
 end
 
 functionSet = defaultFunctionSet  # Let's use the default sets provided
